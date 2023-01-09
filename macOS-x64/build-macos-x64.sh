@@ -3,28 +3,31 @@
 #Configuration Variables and Parameters
 
 #Parameters
-SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$(
+    cd -- "$(dirname "$0")" >/dev/null 2>&1
+    pwd -P
+)"
 TARGET_DIRECTORY="$SCRIPTPATH/target"
 PRODUCT=${1}
 VERSION=${2}
-DATE=`date +%Y-%m-%d`
-TIME=`date +%H:%M:%S`
+DATE=$(date +%Y-%m-%d)
+TIME=$(date +%H:%M:%S)
 LOG_PREFIX="[$DATE $TIME]"
 
 function printSignature() {
-  cat "$SCRIPTPATH/utils/ascii_art.txt"
-  echo
+    cat "$SCRIPTPATH/utils/ascii_art.txt"
+    echo
 }
 
 function printUsage() {
-  echo -e "\033[1mUsage:\033[0m"
-  echo "$0 [APPLICATION_NAME] [APPLICATION_VERSION]"
-  echo
-  echo -e "\033[1mOptions:\033[0m"
-  echo "  -h (--help)"
-  echo
-  echo -e "\033[1mExample::\033[0m"
-  echo "$0 wso2am 2.6.0"
+    echo -e "\033[1mUsage:\033[0m"
+    echo "$0 [APPLICATION_NAME] [APPLICATION_VERSION]"
+    echo
+    echo -e "\033[1mOptions:\033[0m"
+    echo "  -h (--help)"
+    echo
+    echo -e "\033[1mExample::\033[0m"
+    echo "$0 wso2am 2.6.0"
 
 }
 
@@ -32,7 +35,7 @@ function printUsage() {
 printSignature
 
 #Argument validation
-if [[ "$1" == "-h" ||  "$1" == "--help" ]]; then
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
     printUsage
     exit 1
 fi
@@ -92,12 +95,12 @@ createInstallationDirectory() {
     fi
 }
 
-copyDarwinDirectory(){
-  createInstallationDirectory
-  cp -r "$SCRIPTPATH/darwin" "${TARGET_DIRECTORY}/"
-  chmod -R 755 "${TARGET_DIRECTORY}/darwin/scripts"
-  chmod -R 755 "${TARGET_DIRECTORY}/darwin/Resources"
-  chmod 755 "${TARGET_DIRECTORY}/darwin/Distribution"
+copyDarwinDirectory() {
+    createInstallationDirectory
+    cp -r "$SCRIPTPATH/darwin" "${TARGET_DIRECTORY}/"
+    chmod -R 755 "${TARGET_DIRECTORY}/darwin/scripts"
+    chmod -R 755 "${TARGET_DIRECTORY}/darwin/Resources"
+    chmod 755 "${TARGET_DIRECTORY}/darwin/Distribution"
 }
 
 copyBuildDirectory() {
@@ -133,18 +136,18 @@ copyBuildDirectory() {
 function buildPackage() {
     log_info "Application installer package building started.(1/3)"
     pkgbuild --identifier "org.${PRODUCT}.${VERSION}" \
-    --version "${VERSION}" \
-    --scripts "${TARGET_DIRECTORY}/darwin/scripts" \
-    --root "${TARGET_DIRECTORY}/darwinpkg" \
-    "${TARGET_DIRECTORY}/package/${PRODUCT}.pkg" > /dev/null 2>&1
+        --version "${VERSION}" \
+        --scripts "${TARGET_DIRECTORY}/darwin/scripts" \
+        --root "${TARGET_DIRECTORY}/darwinpkg" \
+        "${TARGET_DIRECTORY}/package/${PRODUCT}.pkg" >/dev/null 2>&1
 }
 
 function buildProduct() {
     log_info "Application installer product building started.(2/3)"
     productbuild --distribution "${TARGET_DIRECTORY}/darwin/Distribution" \
-    --resources "${TARGET_DIRECTORY}/darwin/Resources" \
-    --package-path "${TARGET_DIRECTORY}/package" \
-    "${TARGET_DIRECTORY}/pkg/$1" > /dev/null 2>&1
+        --resources "${TARGET_DIRECTORY}/darwin/Resources" \
+        --package-path "${TARGET_DIRECTORY}/package" \
+        "${TARGET_DIRECTORY}/pkg/$1" >/dev/null 2>&1
 }
 
 function signProduct() {
@@ -154,8 +157,8 @@ function signProduct() {
 
     read -p "Please enter the Apple Developer Installer Certificate ID:" APPLE_DEVELOPER_CERTIFICATE_ID
     productsign --sign "Developer ID Installer: ${APPLE_DEVELOPER_CERTIFICATE_ID}" \
-    "${TARGET_DIRECTORY}/pkg/$1" \
-    "${TARGET_DIRECTORY}/pkg-signed/$1"
+        "${TARGET_DIRECTORY}/pkg/$1" \
+        "${TARGET_DIRECTORY}/pkg-signed/$1"
 
     pkgutil --check-signature "${TARGET_DIRECTORY}/pkg-signed/$1"
 }
@@ -174,7 +177,7 @@ function createInstaller() {
     log_info "Application installer generation steps finished."
 }
 
-function createUninstaller(){
+function createUninstaller() {
     cp "$SCRIPTPATH/darwin/Resources/uninstall.sh" "${TARGET_DIRECTORY}/darwinpkg/Library/${PRODUCT}/${VERSION}"
     sed -i '' -e "s/__VERSION__/${VERSION}/g" "${TARGET_DIRECTORY}/darwinpkg/Library/${PRODUCT}/${VERSION}/uninstall.sh"
     sed -i '' -e "s/__PRODUCT__/${PRODUCT}/g" "${TARGET_DIRECTORY}/darwinpkg/Library/${PRODUCT}/${VERSION}/uninstall.sh"
