@@ -14,7 +14,7 @@ For more detailed process please refer medium blog about the macOS installer bui
 Cheers!! 🍺-->
 
 # My notes
-**Based on [article](https://medium.com/swlh/the-easiest-way-to-build-macos-installer-for-your-application-34a11dd08744)**
+**Based on [article](https://medium.com/swlh/the-easiest-way-to-build-macos-installer-for-your-application-34a11dd08744) and observations**
 
 # You need maven & ballerina
 
